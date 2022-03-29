@@ -7,6 +7,9 @@
 #include <string>
 #include <fstream>
 
+uint32_t u_ScreenX;
+uint32_t u_ScreenY;
+
 bool LoadSourceCode(const std::string& filename, std::string& outSource)
 {
 	std::ifstream file(filename);
@@ -60,6 +63,14 @@ void ShaderProgramInfoLog(uint32_t shader, GLenum param)
 		glGetProgramInfoLog(shader, BUFFER_SIZE, nullptr, Buffer);
 		std::cout << Buffer << std::endl;
 	}
+}
+
+
+void ResizeCallback(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
+	glUniform1f(u_ScreenX, (float)width);
+	glUniform1f(u_ScreenY, (float)height);
 }
 
 int main(int argc, char** argv)
@@ -134,7 +145,10 @@ int main(int argc, char** argv)
 	ShaderProgramInfoLog(shaderProgram, GL_LINK_STATUS);
 	ShaderProgramInfoLog(shaderProgram, GL_VALIDATE_STATUS);
 
-	uint32_t uniformTime = glGetUniformLocation(shaderProgram, "u_Time");
+	u_ScreenX = glGetUniformLocation(shaderProgram, "u_ScreenX");
+	u_ScreenY = glGetUniformLocation(shaderProgram, "u_ScreenY");
+
+	glfwSetWindowSizeCallback(window, ResizeCallback);
 
 	while (!glfwWindowShouldClose(window))
 	{
